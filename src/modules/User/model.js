@@ -3,20 +3,17 @@ const mongoose = require('mongoose');
 
 
 const UserSchema=new mongoose.Schema({
-    userName:{
+    firstName:{
     type:String,
      max:[30,'Please Input Your Name'],
     required:[true,'Must Be required your name']
     },
-
-    profilePic:{
-        type:String,
-    },
-    phoneNumber:{
-        type:String,
-        max:[12,'Please Input Your Number'],
-        required:[true,"Must be input Phone Number"]
-    },
+    lastName:{
+      type:String,
+       max:[30,'Please Input Your Name'],
+      required:[true,'Must Be required your name']
+      },
+  
     email: {
         type: String,
         unique: [true, 'your email must be unique/used already'],
@@ -28,6 +25,11 @@ const UserSchema=new mongoose.Schema({
         max: [6, 'Your Password must be in 6 digits'],
         
       },
+      profilePicture:{
+        type: String,
+        
+      },
+
       otp: {
         type: Number,
       },
@@ -41,7 +43,17 @@ const UserSchema=new mongoose.Schema({
         type: Boolean,
         default: false,
       },
-    
+      role: {
+        type: String,
+        //  BU -> Basic User
+        // VIP -> CELERITY VIP
+        // CL -> CHRUCH_LEADER
+        // CP -> CHURCH_PAGE
+        //SA -> Super Admin
+        enum: ['BU', 'VIP', 'CL', 'CP','SA'],
+        require: [true, 'Role must be selected'],
+      },
+
       isVerified: {
         type: Boolean,
         default: false,
@@ -51,6 +63,8 @@ const UserSchema=new mongoose.Schema({
       
 },{ timestamps: true }
 );
+
+
 
 // Password Hash Function using Bycryptjs
 
@@ -69,10 +83,7 @@ UserSchema.pre('save', async function hashPassword(next) {
   };
   
   //Validations
-  UserSchema.path('phoneNumber').validate(function (value) {
-    const regex = /^\d{13}$/; // regular expression to match 11 digits
-    return regex.test(value);
-  }, 'Must be a valid phone number');
+
   
   const UserModel = mongoose.model('user', UserSchema);
   
