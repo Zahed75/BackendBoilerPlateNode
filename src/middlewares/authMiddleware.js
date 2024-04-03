@@ -1,21 +1,22 @@
-require('dotenv').config({});
-const jwt = require('jsonwebtoken');
-const { Unauthorized } = require('../utility/errors');
+var jwt = require('jsonwebtoken');
+
 
 module.exports = (req, res, next) => {
-  let Token = req.headers['authorization']?.split(' ')[1];
+    let Token = req.headers['authorization']?.split(' ')[1]; // Assuming 'Authorization' header
 
-  if (!Token) {
-    throw new Unauthorized('User not logged in');
-  }
+    jwt.verify(Token, "SecretKey12345", function (err, decoded) {
+        if (err) {
+           res.status(401).json({ status: "UnAuthorized" });
+        } else {
+            console.log("Decoded Token:", decoded); // Log decoded data for debugging
 
-  jwt.verify(Token, process.env.AUTH_SECRET_KEY, function (err, decoded) {
-    if (err) {
-      throw new Unauthorized('Access Denied');
-    } else {
-      req.userid = decoded.userId;
-      req.role = decoded.role;
-      next();
-    }
-  });
+            let email = decoded.email;
+            let role = decoded.role;
+
+            req.email = email; // Set email directly on req
+            req.role = role; // Set role directly on req
+            next();
+        }
+    });
 };
+
